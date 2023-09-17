@@ -4,5 +4,5 @@ namespace TaskLord.Services;
 
 public interface IProcessService
 {
-    ServiceProcResult StopProcess();
+    Task<ServiceProcResult> StopProcess();
 }

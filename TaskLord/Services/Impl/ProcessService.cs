@@ -6,26 +6,24 @@ namespace TaskLord.Services.Impl;
 
 public class ProcessService : IProcessService
 {
-    private string ServiceText { get; } = "DataNow";
+    private string ServiceText { get; } = "DataNow_Tray";
 
-    public ServiceProcResult StopProcess()
+    public async Task<ServiceProcResult> StopProcess()
     {
-        var prc = Process.GetProcesses().ToList().Find(process => process.ProcessName.Contains(ServiceText));
+        using var prc = Process.GetProcessesByName(ServiceText).FirstOrDefault();
         if (prc != null)
         {
-            using (prc)
+            try
             {
-                try
-                {
-                    prc.Kill();
-                    return ServiceProcResult.Success;
-                }
-                catch
-                {
-                    return IsProcessForceStopped(prc.Id)
-                        ? ServiceProcResult.Success
-                        : ServiceProcResult.Error;
-                }
+                prc.Kill();
+                await prc.WaitForExitAsync();
+                return ServiceProcResult.Success;
+            }
+            catch
+            {
+                return IsProcessForceStopped(prc.Id)
+                    ? ServiceProcResult.Success
+                    : ServiceProcResult.Error;
             }
         }
         return ServiceProcResult.NoServiceFound;

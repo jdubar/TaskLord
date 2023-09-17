@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using TaskLord.Enums;
 using TaskLord.Services;
 
@@ -26,10 +28,10 @@ public class TaskLordTray : ApplicationContext
 
     private async Task RunInBackground(TimeSpan timeSpan)
     {
-        var periodicTimer = new PeriodicTimer(timeSpan);
+        using var periodicTimer = new PeriodicTimer(timeSpan);
         while (await periodicTimer.WaitForNextTickAsync())
         {
-            switch (_processService.StopProcess())
+            switch (await _processService.StopProcess())
             {
                 case ServiceProcResult.Success:
                     TrayIcon.ShowBalloonTip(500, "Success", "Successfully stopped the service!", ToolTipIcon.Info);
