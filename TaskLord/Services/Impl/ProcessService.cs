@@ -33,7 +33,7 @@ public class ProcessService : IProcessService
     {
         _ = Process.Start(new ProcessStartInfo
         {
-            FileName = "cmd.exe",
+            FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe"),
             CreateNoWindow = true,
             UseShellExecute = false,
             Arguments = $"/c taskkill /pid {id} /f"
