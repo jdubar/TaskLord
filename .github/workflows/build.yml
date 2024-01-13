@@ -44,14 +44,7 @@ jobs:
         shell: powershell
         run: |
           dotnet tool install --global dotnet-coverage
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord"
-               /o:"jdubar"
-               /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-               /d:sonar.cs.opencover.reportsPaths=coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=coverage.xml
           dotnet build --no-incremental
-          coverlet .\TaskLordTests\bin\Debug\net8.0-windows\TaskLordTests.dll
-              --target "dotnet"
-              --targetargs "test --no-build"
-              -f=opencover
-              -o="coverage.xml"
+          coverlet .\TaskLordTests\bin\Debug\net8.0-windows\TaskLordTests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
