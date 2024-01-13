@@ -28,19 +28,27 @@ public class TaskLordTray : ApplicationContext
 
     private async Task RunInBackground(TimeSpan timeSpan)
     {
+        var processes = new[]
+        {
+            _processService.GetServiceText(),
+            _processService.GetTrayText()
+        };
         using var periodicTimer = new PeriodicTimer(timeSpan);
         while (await periodicTimer.WaitForNextTickAsync())
         {
-            switch (await _processService.StopProcess())
+            foreach (var process in processes)
             {
-                case ServiceProcResult.Success:
-                    TrayIcon.ShowBalloonTip(500, "Success", "Successfully stopped the service!", ToolTipIcon.Info);
-                    break;
-                case ServiceProcResult.Error:
-                    TrayIcon.ShowBalloonTip(500, "Error", "Unable to stop the service...", ToolTipIcon.Error);
-                    break;
-                default:
-                    break;
+                switch (await _processService.StopProcess(process))
+                {
+                    case ServiceProcResult.Success:
+                        TrayIcon.ShowBalloonTip(500, "Success", "Successfully stopped the service!", ToolTipIcon.Info);
+                        break;
+                    case ServiceProcResult.Error:
+                        TrayIcon.ShowBalloonTip(500, "Error", "Unable to stop the service...", ToolTipIcon.Error);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
