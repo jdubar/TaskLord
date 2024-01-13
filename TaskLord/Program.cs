@@ -12,7 +12,8 @@ internal static class Program
     {
         ApplicationConfiguration.Initialize();
 
-        var processService = new ProcessService();
+        var process = new ProcessAdapter();
+        var processService = new ProcessService(process);
         var taskLordTray = new TaskLordTray(processService);
         Application.Run(taskLordTray);
     }
