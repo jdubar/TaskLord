@@ -43,9 +43,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          dotnet tool install --global dotnet-coverage
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar"  /d:sonar.host.url=https://sonarcloud.io /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.verbose=true 
           dotnet build
-          dotnet test --logger trx -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
-          dotnet-coverage collect "dotnet test" -f cobertura -o ".sonarqube\conf\SonarQubeAnalysisConfig.xml"
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          dotnet test -p:CollectCoverage=true -p:CoverletOutputFormat=opencover -o="coverage.xml"
+          dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
