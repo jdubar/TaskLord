@@ -44,6 +44,6 @@ jobs:
         shell: powershell
         run: |
           dotnet tool install --global coverlet.console
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=.sonarqube\conf\SonarQubeAnalysisConfig.xml
           coverlet .\TaskLordTests\bin\Debug\net8.0-windows\TaskLordTests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o=".sonarqube\conf\SonarQubeAnalysisConfig.xml"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
