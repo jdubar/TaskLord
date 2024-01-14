@@ -43,7 +43,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vstest.reportsPaths=**/*.trx /d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vstest.reportsPaths=**/*.trx /d:sonar.cs.opencover.reportsPaths=.sonarqube\conf\SonarQubeAnalysisConfig.xml
           dotnet build
           dotnet test --logger trx -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
