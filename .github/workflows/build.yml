@@ -44,5 +44,5 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /s:SonarQube.Analysis.xml
-          dotnet test --settings coverlet.runsettings --logger:trx
+          dotnet test --logger:trx
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
