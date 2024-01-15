@@ -41,7 +41,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: powershell
         run: |
           dotnet tool install --global coverlet.console
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.token=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=".sonarqube\conf\SonarQubeAnalysisConfig.xml"
