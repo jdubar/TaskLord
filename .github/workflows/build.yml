@@ -42,7 +42,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.token=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=*/*.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="CoverageResults/coverage.opencover.xml" /d:"sonar.verbose=true"
           dotnet build
-          dotnet test --collect:"XPlat Code Coverage;Format=opencover"
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
+          dotnet test /p:CollectCoverage=true /p:CoverletOutput="../CoverageResults/" /p:MergeWith="../CoverageResults/coverage.json" /p:CoverletOutputFormat=\"opencover,json\" /maxcpucount:1
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
