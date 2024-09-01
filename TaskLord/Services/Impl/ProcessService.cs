@@ -9,25 +9,26 @@ public class ProcessService(IProcess process) : IProcessService
     public async Task<ServiceProcResult> StopProcess(string name)
     {
         using var prc = process.GetProcessInfo(name);
-        if (prc != null)
+        if (prc is null)
         {
-            using (prc)
+            return ServiceProcResult.NoServiceFound;
+        }
+
+        using (prc)
+        {
+            try
             {
-                try
-                {
-                    prc.Kill();
-                    await prc.WaitForExitAsync();
-                    return ServiceProcResult.Success;
-                }
-                catch
-                {
-                    return process.IsProcessForceStopped(prc.Id)
-                        ? ServiceProcResult.Success
-                        : ServiceProcResult.Error;
-                }
+                prc.Kill();
+                await prc.WaitForExitAsync();
+                return ServiceProcResult.Success;
+            }
+            catch
+            {
+                return process.IsProcessForceStopped(prc.Id)
+                    ? ServiceProcResult.Success
+                    : ServiceProcResult.Error;
             }
         }
-        return ServiceProcResult.NoServiceFound;
     }
 
     public string GetTrayText()

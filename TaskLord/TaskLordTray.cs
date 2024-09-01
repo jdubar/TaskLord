@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 using TaskLord.Enums;
 using TaskLord.Services;
 
@@ -7,14 +5,14 @@ namespace TaskLord;
 
 public class TaskLordTray : ApplicationContext
 {
-    private readonly NotifyIcon TrayIcon;
+    private readonly NotifyIcon _trayIcon;
     private readonly IProcessService _processService;
 
     public TaskLordTray(IProcessService processService)
     {
         _processService = processService;
 
-        TrayIcon = new NotifyIcon()
+        _trayIcon = new NotifyIcon()
         {
             Icon = Resources.Icon,
             ContextMenuStrip = new ContextMenuStrip()
@@ -41,11 +39,14 @@ public class TaskLordTray : ApplicationContext
                 switch (await _processService.StopProcess(process))
                 {
                     case ServiceProcResult.Success:
-                        TrayIcon.ShowBalloonTip(500, "Success", "Successfully stopped the service!", ToolTipIcon.Info);
+                        _trayIcon.ShowBalloonTip(500, "Success", "Successfully stopped the service!", ToolTipIcon.Info);
                         break;
                     case ServiceProcResult.Error:
-                        TrayIcon.ShowBalloonTip(500, "Error", "Unable to stop the service...", ToolTipIcon.Error);
+                        _trayIcon.ShowBalloonTip(500, "Error", "Unable to stop the service...", ToolTipIcon.Error);
                         break;
+                    case ServiceProcResult.Unknown:
+                    case ServiceProcResult.UnableToKill:
+                    case ServiceProcResult.NoServiceFound:
                     default:
                         break;
                 }
@@ -55,7 +56,7 @@ public class TaskLordTray : ApplicationContext
 
     private void Exit(object? sender, EventArgs e)
     {
-        TrayIcon.Visible = false;
+        _trayIcon.Visible = false;
         Application.Exit();
     }
 }

@@ -1,48 +1,35 @@
 name: Build
+
 on:
+  # Trigger analysis when pushing in master or pull requests, and when creating
+  # a pull request.
   push:
     branches:
-      - master
+      - main
   pull_request:
-    types: [opened, synchronize, reopened]
+    types:
+      - opened
+      - synchronize
+      - reopened
+
 jobs:
-  build:
-    strategy:
-      matrix:
-        configuration: [Debug]
-
-    runs-on: windows-latest  # For a list of available runner types, refer to
-                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-
-    env:
-      Solution_Name: TaskLord.sln                                 # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: TaskLordTests\TaskLordTests.csproj         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-
+  sonarcloud:
+    name: Codecov
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        # Disabling shallow clone is recommended for improving relevancy of sonarqube reporting
-        fetch-depth: 0
+      - uses: actions/checkout@v2
+        with:
+          # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
-    # Run the Sonar scanner
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: 17
-        distribution: 'zulu'
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore /p:ContinuousIntegrationBuild=true
+      - name: Test
+        run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
-    - name: Install dependencies
-      run: dotnet restore
-
-    - name: Begin Sonar scan and build
-      run: |
-        dotnet tool install --global dotnet-sonarscanner
-        dotnet sonarscanner begin /k:"jdubar_TaskLord" /o:"jdubar" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vstest.reportsPaths=**/*.trx /d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
-        dotnet build
-        dotnet test --logger trx -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
-
-    - name: End Sonar scan
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-      run: |
-        dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: Codecov
+        uses: codecov/codecov-action@v4.5.0
+        with:
+          token: 646f07f7-66f7-4c54-b3ea-6b1a1d92475b

@@ -7,12 +7,7 @@ namespace TaskLordTests;
 
 public class ProcessTests
 {
-    private IProcessService ProcessService { get; set; }
-
-    public ProcessTests()
-    {
-        ProcessService = A.Fake<IProcessService>();
-    }
+    private IProcessService ProcessService { get; } = A.Fake<IProcessService>();
 
     [Theory]
     [InlineData(ServiceProcResult.NoServiceFound)]
@@ -21,7 +16,7 @@ public class ProcessTests
     public async Task FindProcess_ShouldReturn_ExpectedResult(ServiceProcResult expected)
     {
         // Given
-        var name = "SomeProcess";
+        const string name = "SomeProcess";
         A.CallTo(() => ProcessService.StopProcess(name)).Returns(Task.FromResult(expected));
 
         // When
