@@ -4,7 +4,7 @@ using TaskLord.Enums;
 
 namespace TaskLord.Services.Impl;
 
-public class ProcessService(IProcess process) : IProcessService, IDisposable
+public class ProcessService(IProcessAdapter process) : IProcessService, IDisposable
 {
     private bool _disposed;
 
@@ -36,13 +36,13 @@ public class ProcessService(IProcess process) : IProcessService, IDisposable
         }
     }
 
-    public string GetTrayText()
+    public static string GetTrayText()
     {
         byte[] bytes = [68, 97, 116, 97, 78, 111, 119, 95, 84, 114, 97, 121];
         return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
     }
 
-    public string GetServiceText()
+    public static string GetServiceText()
     {
         byte[] bytes = [68, 97, 116, 97, 78, 111, 119, 95, 83, 101, 114, 118, 105, 99, 101];
         return Encoding.UTF8.GetString(bytes, 0, bytes.Length);

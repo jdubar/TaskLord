@@ -2,7 +2,7 @@
 using System.IO;
 
 namespace TaskLord.Services.Impl;
-public class ProcessAdapter : IProcess, IDisposable
+public class ProcessAdapter : IProcessAdapter, IDisposable
 {
     public Process? GetProcessInfo(string processName) => Process.GetProcessesByName(processName).FirstOrDefault();
 

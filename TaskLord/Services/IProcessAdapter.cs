@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
 namespace TaskLord.Services;
-public interface IProcess
+public interface IProcessAdapter
 {
     Process? GetProcessInfo(string processName);
     bool IsProcessForceStopped(int id);
