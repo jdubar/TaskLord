@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
+using System.IO;
 
 namespace TaskLord.Services.Impl;
-public class ProcessAdapter : IProcess
+public class ProcessAdapter : IProcess, IDisposable
 {
-    public Process? GetProcessInfo(string processName) =>
-        Process.GetProcessesByName(processName).FirstOrDefault();
+    public Process? GetProcessInfo(string processName) => Process.GetProcessesByName(processName).FirstOrDefault();
 
     public bool IsProcessForceStopped(int id)
     {
@@ -15,6 +15,9 @@ public class ProcessAdapter : IProcess
             UseShellExecute = false,
             Arguments = $"/c taskkill /pid {id} /f"
         });
+
         return Process.GetProcessById(id) == null;
     }
+
+    public void Dispose() => GC.SuppressFinalize(this);
 }

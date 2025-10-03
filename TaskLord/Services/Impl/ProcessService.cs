@@ -4,8 +4,13 @@ using TaskLord.Enums;
 
 namespace TaskLord.Services.Impl;
 
-public class ProcessService(IProcess process) : IProcessService
+public class ProcessService(IProcess process) : IProcessService, IDisposable
 {
+    private bool _disposed;
+
+    public string ServiceName => GetServiceText();
+    public string TrayName => GetTrayText();
+
     public async Task<ServiceProcResult> StopProcess(string name)
     {
         using var prc = process.GetProcessInfo(name);
@@ -41,5 +46,28 @@ public class ProcessService(IProcess process) : IProcessService
     {
         byte[] bytes = [68, 97, 116, 97, 78, 111, 119, 95, 83, 101, 114, 118, 105, 99, 101];
         return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            if (process is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+        _disposed = true;
     }
 }
