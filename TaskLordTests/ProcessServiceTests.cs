@@ -5,24 +5,23 @@ using TaskLord.Services;
 
 namespace TaskLordTests;
 
-public class ProcessTests
+public class ProcessServiceTests
 {
-    private IProcessService ProcessService { get; } = A.Fake<IProcessService>();
-
     [Theory]
     [InlineData(ServiceProcResult.NoServiceFound)]
     [InlineData(ServiceProcResult.Success)]
     [InlineData(ServiceProcResult.Error)]
     public async Task FindProcess_ShouldReturn_ExpectedResult(ServiceProcResult expected)
     {
-        // Given
-        const string name = "SomeProcess";
-        A.CallTo(() => ProcessService.StopProcess(name)).Returns(Task.FromResult(expected));
+        // Arrange
+        var process = "SomeProcess";
+        var service = A.Fake<IProcessService>();
+        A.CallTo(() => service.StopProcess(process)).Returns(Task.FromResult(expected));
 
-        // When
-        var actual = await ProcessService.StopProcess(name);
+        // Act
+        var actual = await service.StopProcess(process);
 
-        // Then
+        // Assert
         Assert.Equal(expected, actual);
     }
 }

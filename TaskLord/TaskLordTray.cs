@@ -7,6 +7,8 @@ public class TaskLordTray : ApplicationContext
 {
     private readonly NotifyIcon _trayIcon;
     private readonly IProcessService _processService;
+    private readonly CancellationTokenSource _cts = new();
+    private readonly Task? _backgroundTask;
 
     public TaskLordTray(IProcessService processService)
     {
@@ -19,44 +21,62 @@ public class TaskLordTray : ApplicationContext
             {
                 Items = { new ToolStripMenuItem("Exit", null, Exit) }
             },
+            Text = "Service is running...",
             Visible = true
         };
-        _ = RunInBackground(TimeSpan.FromSeconds(10));
+
+        _backgroundTask = RunInBackground(TimeSpan.FromSeconds(10), _cts.Token);
     }
 
-    private async Task RunInBackground(TimeSpan timeSpan)
+    private async Task RunInBackground(TimeSpan timeSpan, CancellationToken cancellationToken)
     {
         var processes = new[]
         {
-            _processService.GetServiceText(),
-            _processService.GetTrayText()
+            _processService.ServiceName,
+            _processService.TrayName
         };
+
         using var periodicTimer = new PeriodicTimer(timeSpan);
-        while (await periodicTimer.WaitForNextTickAsync())
+        try
         {
-            foreach (var process in processes)
+            while (await periodicTimer.WaitForNextTickAsync(cancellationToken))
             {
-                switch (await _processService.StopProcess(process))
+                foreach (var process in processes)
                 {
-                    case ServiceProcResult.Success:
-                        _trayIcon.ShowBalloonTip(500, "Success", "Successfully stopped the service!", ToolTipIcon.Info);
+                    if (await _processService.StopProcess(process) is ServiceProcResult.Error)
+                    {
+                        _trayIcon.ShowBalloonTip(500, "Error", $"Unable to stop {process}", ToolTipIcon.Error);
                         break;
-                    case ServiceProcResult.Error:
-                        _trayIcon.ShowBalloonTip(500, "Error", "Unable to stop the service...", ToolTipIcon.Error);
-                        break;
-                    case ServiceProcResult.Unknown:
-                    case ServiceProcResult.UnableToKill:
-                    case ServiceProcResult.NoServiceFound:
-                    default:
-                        break;
+                    }
                 }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when the token is canceled
+        }
+        catch (Exception ex)
+        {
+            _trayIcon.ShowBalloonTip(500, "Error", $"Background error: {ex.Message}", ToolTipIcon.Error);
         }
     }
 
     private void Exit(object? sender, EventArgs e)
     {
+        _cts.Cancel();
         _trayIcon.Visible = false;
+        Dispose(true);
         Application.Exit();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _trayIcon.Dispose();
+            _cts.Dispose();
+            _backgroundTask?.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

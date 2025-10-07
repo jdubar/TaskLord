@@ -1,4 +1,4 @@
-name: Build
+name: Codecov
 
 on:
   # Trigger analysis when pushing in master or pull requests, and when creating
@@ -17,19 +17,18 @@ jobs:
     name: Codecov
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.7
         with:
           # Shallow clones should be disabled for a better relevancy of analysis
           fetch-depth: 0
 
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --no-restore /p:ContinuousIntegrationBuild=true
+      - name: Restore .NET workloads
+        run: dotnet workload restore --verbosity minimal
+
       - name: Test
-        run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        run: dotnet test --verbosity minimal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Codecov
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@v5.4.3
         with:
-          token: 646f07f7-66f7-4c54-b3ea-6b1a1d92475b
+          token: ${{ secrets.CODECOV_TOKEN }}
