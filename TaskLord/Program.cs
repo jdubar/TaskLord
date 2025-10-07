@@ -4,7 +4,7 @@ using TaskLord.Models;
 using TaskLord.Services.Impl;
 
 namespace TaskLord;
-
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 internal static class Program
 {
     /// <summary>
@@ -32,8 +32,7 @@ internal static class Program
 
             using var automation = new AutomationService(automationOptions);
             using var processWrapper = new ProcessWrapper();
-            using var process = new ProcessAdapter(processWrapper);
-            using var processService = new ProcessService(process);
+            using var processService = new ProcessService(processWrapper);
             using var taskLordTray = new TaskLordTray(processService);
 
             automation.AddAutomationEventHandler();

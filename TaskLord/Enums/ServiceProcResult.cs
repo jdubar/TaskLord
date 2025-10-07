@@ -1,5 +1,4 @@
 ﻿namespace TaskLord.Enums;
-
 public enum ServiceProcResult
 {
     Unknown,

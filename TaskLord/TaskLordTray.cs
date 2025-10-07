@@ -2,7 +2,7 @@ using TaskLord.Enums;
 using TaskLord.Services;
 
 namespace TaskLord;
-
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class TaskLordTray : ApplicationContext
 {
     private readonly NotifyIcon _trayIcon;
