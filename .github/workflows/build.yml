@@ -28,4 +28,5 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v5.4.3
         with:
+          files: './TestResults/**/*.cobertura.xml'
           token: ${{ secrets.CODECOV_TOKEN }}
