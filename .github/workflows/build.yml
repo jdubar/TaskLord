@@ -1,41 +1,31 @@
-name: .NET Core WPF CI/CD
+name: Codecov
 
-# Run on every push to the 'main' branch and on pull requests
 on:
+  # Trigger analysis when pushing in master or pull requests, and when creating
+  # a pull request.
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    types:
+      - opened
+      - synchronize
+      - reopened
 
-# A workflow run is made up of one or more jobs
 jobs:
-  build_and_test:
-    # A single job that runs on the latest version of Windows
+  codecov:
+    name: Codecov
     runs-on: windows-latest
-
     steps:
-      # Checkout the repository
-      - uses: actions/checkout@v4
-
-      # Setup the .NET SDK version
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4.1.7
         with:
-          dotnet-version: '9.0.x'
+          # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
-      # Run tests and collect code coverage
-      # The '--collect:"XPlat Code Coverage"' argument tells Coverlet to generate a coverage report
-      - name: Test and collect coverage
-        run: dotnet test --collect:"XPlat Code Coverage" --results-directory:"./TestResults"
+      - name: Test
+        run: dotnet test --verbosity minimal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
-      # Upload coverage report to Codecov
-      # The v5 action is recommended for newer projects
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Codecov
+        uses: codecov/codecov-action@v5.4.3
         with:
-          # A token is only required for private repositories
           token: ${{ secrets.CODECOV_TOKEN }}
-          # The location of the generated coverage file
-          files: './TestResults/**/coverage.cobertura.xml'
-          name: codecov-WPF-C#
-          verbose: true # for debug mode

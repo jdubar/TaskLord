@@ -3,6 +3,7 @@
 using System.Diagnostics;
 
 using TaskLord.Services;
+using TaskLord.Services.Impl;
 
 namespace TaskLordTests;
 public class ProcessAdapterTests
@@ -13,8 +14,9 @@ public class ProcessAdapterTests
         // Arrange
         var processName = "explorer.exe";
         var expected = new Process();
-        var process = A.Fake<IProcessAdapter>();
-        A.CallTo(() => process.GetProcessInfo(processName)).Returns(expected);
+        var wrapper = A.Fake<IProcessWrapper>();
+        var process = new ProcessAdapter(wrapper);
+        A.CallTo(() => wrapper.GetProcessByName(processName)).Returns(expected);
 
         // Act
         var actual = process.GetProcessInfo(processName);
@@ -28,8 +30,9 @@ public class ProcessAdapterTests
     {
         // Arrange
         var processName = "invalid_process";
-        var process = A.Fake<IProcessAdapter>();
-        A.CallTo(() => process.GetProcessInfo(processName)).Returns(null);
+        var wrapper = A.Fake<IProcessWrapper>();
+        var process = new ProcessAdapter(wrapper);
+        A.CallTo(() => wrapper.GetProcessByName(processName)).Returns(null);
 
         // Act
         var actual = process.GetProcessInfo(processName);
@@ -43,8 +46,9 @@ public class ProcessAdapterTests
     {
         // Arrange
         var processId = 1234; // Example process ID
-        var process = A.Fake<IProcessAdapter>();
-        A.CallTo(() => process.IsProcessForceStopped(processId)).Returns(true);
+        var wrapper = A.Fake<IProcessWrapper>();
+        var process = new ProcessAdapter(wrapper);
+        A.CallTo(() => wrapper.GetProcessById(processId))!.Returns(null);
 
         // Act
         var actual = process.IsProcessForceStopped(processId);
@@ -58,8 +62,9 @@ public class ProcessAdapterTests
     {
         // Arrange
         var processId = 5678; // Example process ID
-        var process = A.Fake<IProcessAdapter>();
-        A.CallTo(() => process.IsProcessForceStopped(processId)).Returns(false);
+        var wrapper = A.Fake<IProcessWrapper>();
+        var process = new ProcessAdapter(wrapper);
+        A.CallTo(() => wrapper.GetProcessById(processId)).Returns(new Process());
 
         // Act
         var actual = process.IsProcessForceStopped(processId);

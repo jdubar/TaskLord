@@ -31,7 +31,8 @@ internal static class Program
             }
 
             using var automation = new AutomationService(automationOptions);
-            using var process = new ProcessAdapter();
+            using var processWrapper = new ProcessWrapper();
+            using var process = new ProcessAdapter(processWrapper);
             using var processService = new ProcessService(process);
             using var taskLordTray = new TaskLordTray(processService);
 
