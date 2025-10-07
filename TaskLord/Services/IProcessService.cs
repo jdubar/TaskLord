@@ -5,6 +5,6 @@ namespace TaskLord.Services;
 public interface IProcessService
 {
     Task<ServiceProcResult> StopProcess(string name);
-    string GetTrayText();
-    string GetServiceText();
+    string ServiceName { get; }
+    string TrayName { get; }
 }
