@@ -1,56 +1,35 @@
-﻿using System.Diagnostics;
-using System.IO;
-
-using TaskLord.Enums;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace TaskLord.Services.Impl;
-public class ProcessWrapper : IProcessWrapper, IDisposable
+public class ProcessWrapper : IProcessWrapper
 {
-    public async Task<ServiceProcResult> StopProcess(string name)
-    {
-        using var process = GetProcessInfo(name);
-        if (process is null)
-        {
-            return ServiceProcResult.NoServiceFound;
-        }
+    public Process GetProcessById(int id) => Process.GetProcessById(id);
 
-        using (process)
+    public Process[] GetProcessesByName(string processName) => Process.GetProcessesByName(processName);
+
+    public async Task<bool> KillAsync(Process process)
+    {
+        try
         {
-            try
-            {
-                process.Kill();
-                await process.WaitForExitAsync();
-                return ServiceProcResult.Success;
-            }
-            catch
-            {
-                return IsProcessForceStopped(process.Id)
-                    ? ServiceProcResult.Success
-                    : ServiceProcResult.Error;
-            }
+            process.Kill();
+            await process.WaitForExitAsync();
+            return true;
+        }
+        catch (Win32Exception)
+        {
+            return false;
         }
     }
 
-    private static Process GetProcessById(int id) => Process.GetProcessById(id);
-
-    private static Process? GetProcessInfo(string processName) => Process.GetProcessesByName(processName).FirstOrDefault();
-
-    private static bool IsProcessForceStopped(int id)
-    {
-        TaskKillProcessByPid(id);
-        return GetProcessById(id) == null;
-    }
-
-    private static void TaskKillProcessByPid(int id)
+    public void Start(string fileName, string arguments)
     {
         _ = Process.Start(new ProcessStartInfo
         {
-            FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe"),
+            FileName = fileName,
+            Arguments = arguments,
             CreateNoWindow = true,
-            UseShellExecute = false,
-            Arguments = $"/c taskkill /pid {id} /f"
+            UseShellExecute = false
         });
     }
-
-    public void Dispose() => GC.SuppressFinalize(this);
 }

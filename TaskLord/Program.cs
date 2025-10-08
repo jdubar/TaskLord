@@ -30,9 +30,9 @@ internal static class Program
                 return;
             }
 
-            using var automation = new AutomationService(automationOptions);
-            using var processWrapper = new ProcessWrapper();
-            using var processService = new ProcessService(processWrapper);
+            var processWrapper = new ProcessWrapper();
+            var processService = new ProcessService(processWrapper);
+            var automation = new AutomationService(automationOptions);
             using var taskLordTray = new TaskLordTray(processService);
 
             automation.AddAutomationEventHandler();

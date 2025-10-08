@@ -3,35 +3,34 @@ using TaskLord.Utilities;
 
 namespace TaskLord.Services.Impl;
 
-public class ProcessService(IProcessWrapper process) : IProcessService, IDisposable
+public class ProcessService(IProcessWrapper process) : IProcessService
 {
-    private bool _disposed;
-
     public string ServiceName => TextUtility.ServiceName();
     public string TrayName => TextUtility.TrayName();
 
-    public async Task<ServiceProcResult> StopProcess(string name) => await process.StopProcess(name);
-
-    public void Dispose()
+    public async Task<ServiceProcResult> StopProcess(string name)
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        var prc = process.GetProcessesByName(name).FirstOrDefault();
+        if (prc is null)
+        {
+            return ServiceProcResult.NoServiceFound;
+        }
+
+        if (await process.KillAsync(prc))
+        {
+            return ServiceProcResult.Success;
+        }
+        else
+        {
+            return IsProcessForceStopped(prc.Id)
+                ? ServiceProcResult.Success
+                : ServiceProcResult.Error;
+        }
     }
 
-    protected virtual void Dispose(bool disposing)
+    private bool IsProcessForceStopped(int id)
     {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            if (process is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
-        _disposed = true;
+        process.Start(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe"), $"/c taskkill /pid {id} /f");
+        return process.GetProcessById(id) is null;
     }
 }

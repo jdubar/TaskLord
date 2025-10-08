@@ -3,7 +3,7 @@
 using TaskLord.Models;
 
 namespace TaskLord.Services.Impl;
-public class AutomationService(AutomationOptions options) : IAutomationService, IDisposable
+public class AutomationService(AutomationOptions options) : IAutomationService
 {
     public void RemoveAllEventHandlers() => Automation.RemoveAllEventHandlers();
 
@@ -61,11 +61,5 @@ public class AutomationService(AutomationOptions options) : IAutomationService, 
                      .Cast<AutomationElement>()
                      .FirstOrDefault(e => e.Current.ControlType.LocalizedControlType == control.Value &&
                                           e.Current.ControlType.Id == control.Key);
-    }
-
-    public void Dispose()
-    {
-        RemoveAllEventHandlers();
-        GC.SuppressFinalize(this);
     }
 }

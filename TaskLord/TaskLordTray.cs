@@ -3,7 +3,7 @@ using TaskLord.Services;
 
 namespace TaskLord;
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-public class TaskLordTray : ApplicationContext
+public class TaskLordTray : ApplicationContext, IDisposable
 {
     private readonly NotifyIcon _trayIcon;
     private readonly IProcessService _processService;
@@ -65,7 +65,6 @@ public class TaskLordTray : ApplicationContext
     {
         _cts.Cancel();
         _trayIcon.Visible = false;
-        Dispose(true);
         Application.Exit();
     }
 

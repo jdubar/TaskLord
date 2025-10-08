@@ -1,7 +1,10 @@
-﻿using TaskLord.Enums;
+﻿using System.Diagnostics;
 
 namespace TaskLord.Services;
 public interface IProcessWrapper
 {
-    Task<ServiceProcResult> StopProcess(string name);
+    Process GetProcessById(int id);
+    Process[] GetProcessesByName(string processName);
+    Task<bool> KillAsync(Process process);
+    void Start(string fileName, string arguments);
 }
