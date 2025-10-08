@@ -1,0 +1,9 @@
+# codecov.yml
+# This file will be found automatically by the Codecov Action.
+
+ignore:
+  # Ignore all automatically generated resource designer files.
+  - "**/*.Designer.cs"
+
+  # You can add more patterns here to ignore other files or directories,
+  # like generated code, migrations, etc.
