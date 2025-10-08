@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace TaskLord.Services.Impl;
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "No need to test wrapper code")]
 public class ProcessWrapper : IProcessWrapper
 {
     public Process GetProcessById(int id) => Process.GetProcessById(id);
@@ -16,7 +16,7 @@ public class ProcessWrapper : IProcessWrapper
             await process.WaitForExitAsync();
             return true;
         }
-        catch (Win32Exception)
+        catch (Exception)
         {
             return false;
         }
