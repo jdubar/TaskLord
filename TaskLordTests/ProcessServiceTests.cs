@@ -47,6 +47,45 @@ public class ProcessServiceTests
     }
 
     [Fact]
+    public async Task StopProcess_ShouldReturn_Success_WhenProcessKillFailsButIsForceStopped()
+    {
+        // Arrange
+        Process[] processes = [A.Fake<Process>()];
+        var process = "SomeProcess";
+        var expected = ServiceProcResult.Success;
+        var wrapper = A.Fake<IProcessWrapper>();
+        var service = new ProcessService(wrapper);
+        A.CallTo(() => wrapper.GetProcessesByName(A<string>._)).Returns(processes);
+        A.CallTo(() => wrapper.KillAsync(A<Process>._)).Returns(false);
+
+        // Act
+        var actual = await service.StopProcess(process);
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public async Task StopProcess_ShouldReturn_Error_WhenProcessKillFailsAndIsForceStoppedFails()
+    {
+        // Arrange
+        Process[] processes = [A.Fake<Process>()];
+        var process = "SomeProcess";
+        var expected = ServiceProcResult.Success;
+        var wrapper = A.Fake<IProcessWrapper>();
+        var service = new ProcessService(wrapper);
+        A.CallTo(() => wrapper.GetProcessesByName(A<string>._)).Returns(processes);
+        A.CallTo(() => wrapper.KillAsync(A<Process>._)).Returns(false);
+        A.CallTo(() => wrapper.GetProcessById(A<int>._)).Returns(A.Fake<Process>());
+
+        // Act
+        var actual = await service.StopProcess(process);
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
     public void ServiceName_ShouldReturn_ExpectedValue()
     {
         // Arrange
