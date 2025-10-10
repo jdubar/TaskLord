@@ -1,4 +1,4 @@
-﻿namespace TaskLord.Services;
+﻿namespace TaskLord.Wrappers;
 public interface IProcess
 {
     bool ProcessIdExists(int id);

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 
 using TaskLord.Models;
 using TaskLord.Services.Impl;
+using TaskLord.Wrappers.Impl;
 
 namespace TaskLord;
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
@@ -30,14 +31,15 @@ internal static class Program
                 return;
             }
 
+            var sendKeysWrapper = new SendKeysWrapper();
             var processWrapper = new ProcessWrapper();
             var processService = new ProcessService(processWrapper);
-            var automation = new AutomationService(automationOptions);
+            var automationService = new AutomationService(sendKeysWrapper, automationOptions);
             using var taskLordTray = new TaskLordTray(processService);
 
-            automation.AddAutomationEventHandler();
+            automationService.AddAutomationEventHandler();
             Application.Run(taskLordTray);
-            automation.RemoveAllEventHandlers();
+            automationService.RemoveAllEventHandlers();
         }
         catch (Exception ex)
         {

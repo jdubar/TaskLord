@@ -1,8 +1,8 @@
 using FakeItEasy;
 
 using TaskLord.Enums;
-using TaskLord.Services;
 using TaskLord.Services.Impl;
+using TaskLord.Wrappers;
 
 namespace TaskLordTests;
 

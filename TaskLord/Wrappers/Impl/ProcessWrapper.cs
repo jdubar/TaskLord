@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace TaskLord.Services.Impl;
+namespace TaskLord.Wrappers.Impl;
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "No need to test wrapper code")]
 public class ProcessWrapper : IProcess
 {

@@ -1,17 +1,20 @@
 ﻿using System.Windows.Automation;
 
 using TaskLord.Models;
+using TaskLord.Wrappers;
 
 namespace TaskLord.Services.Impl;
-public class AutomationService(AutomationOptions options) : IAutomationService
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "UI-based code cannot be easily tested")]
+public class AutomationService(
+    ISendKeys sendKeys,
+    AutomationOptions options) : IAutomationService
 {
-    public void RemoveAllEventHandlers() => Automation.RemoveAllEventHandlers();
-
     public void AddAutomationEventHandler()
         => Automation.AddAutomationEventHandler(eventId: WindowPattern.WindowOpenedEvent,
                                                 element: AutomationElement.RootElement,
                                                 scope: TreeScope.Children,
                                                 eventHandler: OnWindowOpened);
+    public void RemoveAllEventHandlers() => Automation.RemoveAllEventHandlers();
 
     private void OnWindowOpened(object sender, AutomationEventArgs automationEventArgs)
     {
@@ -31,15 +34,13 @@ public class AutomationService(AutomationOptions options) : IAutomationService
             if (edit.TryGetCurrentPattern(ValuePattern.Pattern, out object pattern))
             {
                 ((ValuePattern)pattern).SetValue(options.TextToWrite);
-                SendKeys.SendWait(".");
+                sendKeys.SendWait(".");
             }
             else
             {
                 edit.SetFocus();
-                SendKeys.SendWait("^{HOME}"); // Move to start of control
-                SendKeys.SendWait("^+{END}"); // Select all text
-                SendKeys.SendWait("{DEL}");   // Delete selected text
-                SendKeys.SendWait(options.TextToWrite);
+                sendKeys.SelectAllAndDelete();
+                sendKeys.SendWait(options.TextToWrite);
             }
 
             var submit = GetWindowControl(window, options.ButtonControl);
