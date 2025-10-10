@@ -43,7 +43,7 @@ public class TaskLordTray : ApplicationContext, IDisposable
             {
                 foreach (var process in processes)
                 {
-                    if (await _processService.StopProcess(process) is ServiceProcResult.Error)
+                    if (await _processService.StopProcessAsync(process) is ServiceProcResult.UnableToKill)
                     {
                         _trayIcon.ShowBalloonTip(500, "Error", $"Unable to stop {process}", ToolTipIcon.Error);
                         break;

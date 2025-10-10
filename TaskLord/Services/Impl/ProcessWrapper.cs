@@ -2,23 +2,29 @@
 
 namespace TaskLord.Services.Impl;
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "No need to test wrapper code")]
-public class ProcessWrapper : IProcessWrapper
+public class ProcessWrapper : IProcess
 {
-    public Process GetProcessById(int id) => Process.GetProcessById(id);
+    public bool ProcessIdExists(int id) => GetProcessById(id) is not null;
 
-    public Process[] GetProcessesByName(string processName) => Process.GetProcessesByName(processName);
+    public IEnumerable<int> GetProcessIdsByName(string name) => Process.GetProcessesByName(name).Select(p => p.Id);
 
-    public async Task<bool> KillAsync(Process process)
+    public async Task<bool> KillAsync(int id)
     {
         try
         {
+            using var process = GetProcessById(id);
             process.Kill();
             await process.WaitForExitAsync();
-            return true;
+            return process.HasExited;
+        }
+        catch (ArgumentException)
+        {
+            // Process with the specified ID does not exist.
+            return true; // Consider it "killed" since it doesn't exist.
         }
         catch (Exception)
         {
-            return false;
+            return false; // Indicate failure to kill the process.
         }
     }
 
@@ -32,4 +38,6 @@ public class ProcessWrapper : IProcessWrapper
             UseShellExecute = false
         });
     }
+
+    private static Process GetProcessById(int id) => Process.GetProcessById(id);
 }
