@@ -22,9 +22,6 @@ jobs:
           # Shallow clones should be disabled for a better relevancy of analysis
           fetch-depth: 0
 
-      - name: Restore .NET workloads
-        run: dotnet workload restore --verbosity minimal
-
       - name: Test
         run: dotnet test --verbosity minimal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 

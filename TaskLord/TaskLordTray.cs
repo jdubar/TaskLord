@@ -2,8 +2,8 @@ using TaskLord.Enums;
 using TaskLord.Services;
 
 namespace TaskLord;
-
-public class TaskLordTray : ApplicationContext
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public class TaskLordTray : ApplicationContext, IDisposable
 {
     private readonly NotifyIcon _trayIcon;
     private readonly IProcessService _processService;
@@ -43,7 +43,7 @@ public class TaskLordTray : ApplicationContext
             {
                 foreach (var process in processes)
                 {
-                    if (await _processService.StopProcess(process) is ServiceProcResult.Error)
+                    if (await _processService.StopProcessAsync(process) is ServiceProcResult.UnableToKill)
                     {
                         _trayIcon.ShowBalloonTip(500, "Error", $"Unable to stop {process}", ToolTipIcon.Error);
                         break;
@@ -65,7 +65,6 @@ public class TaskLordTray : ApplicationContext
     {
         _cts.Cancel();
         _trayIcon.Visible = false;
-        Dispose(true);
         Application.Exit();
     }
 

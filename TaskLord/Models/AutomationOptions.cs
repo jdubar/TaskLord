@@ -1,4 +1,5 @@
 ﻿namespace TaskLord.Models;
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public record AutomationOptions
 {
     /// <summary>
